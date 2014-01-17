@@ -5,3 +5,4 @@ from txssmi.builder import SSMICommand
 
 Login = SSMICommand.create('LOGIN')
 Ack = SSMICommand.create('ACK')
+SendSMS = SSMICommand.create('SEND_SMS', {"validity": 0})
