@@ -72,7 +72,11 @@ class ProtocolTestCase(TestCase):
     @inlineCallbacks
     def test_link_check(self):
         self.assertFalse(self.transport.value())
+        self.protocol.authenticated = False
         self.protocol.link_check.start(60)
+        self.assertEqual(self.transport.value(), '')
+        self.protocol.authenticated = True
+        self.clock.advance(60)
         [check1] = yield self.receive(1)
         self.clock.advance(60)
         [check2] = yield self.receive(1)

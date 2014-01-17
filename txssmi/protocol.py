@@ -23,7 +23,7 @@ class SSMIProtocol(LineReceiver):
 
     def __init__(self):
         self.authenticated = False
-        self.command_queue = DeferredQueue()
+        self.event_queue = DeferredQueue()
         self.link_check = LoopingCall(self.send_link_request)
         self.link_check.clock = self.clock
 
@@ -42,6 +42,8 @@ class SSMIProtocol(LineReceiver):
         return succeed(self.sendLine(str(command)))
 
     def send_link_request(self):
+        if not self.authenticated:
+            return
         return self.send_command(LinkCheck())
 
     def login(self, username, password):
@@ -49,13 +51,13 @@ class SSMIProtocol(LineReceiver):
 
     def authenticate(self, username, password):
         d = self.login(username, password)
-        d.addCallback(lambda _: self.command_queue.get())
-        d.addCallback(lambda cmd: (cmd.command_id == COMMAND_IDS['ACK'] and
-                                   cmd.ack_type == ACK_TYPES['LOGIN_OK']))
+        d.addCallback(lambda _: self.event_queue.get())
 
-        def cb(result):
-            self.authenticated = result
-            return result
+        def cb(cmd):
+            success = (cmd.command_id == COMMAND_IDS['ACK'] and
+                       cmd.ack_type == ACK_TYPES['LOGIN_OK'])
+            self.authenticated = success
+            return cmd
 
         d.addCallback(cb)
         return d
@@ -65,4 +67,7 @@ class SSMIProtocol(LineReceiver):
             SendSMS(msisdn=msisdn, message=message, validity=validity))
 
     def handle_ACK(self, ack):
-        return self.command_queue.put(ack)
+        return self.event_queue.put(ack)
+
+    def handle_NACK(self, nack):
+        return self.event_queue.put(nack)
