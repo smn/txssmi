@@ -25,12 +25,13 @@ class SSMIProtocol(LineReceiver):
             log.msg('%s %s' % (prefix, msg))
 
     def lineReceived(self, line):
-        cmd = SSMICommand.parse(line)
-        handler = getattr(self, 'handle_%s' % (cmd.command_name,))
-        return maybeDeferred(handler, cmd)
+        command = SSMICommand.parse(line)
+        self.emit('<<', repr(command))
+        handler = getattr(self, 'handle_%s' % (command.command_name,))
+        return maybeDeferred(handler, command)
 
     def send_command(self, command):
-        self.emit('>>', '%s: %s' % (command.command_name, command.values))
+        self.emit('>>', repr(command))
         return succeed(self.sendLine(str(command)))
 
     def login(self, username, password):
