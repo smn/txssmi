@@ -1,9 +1,10 @@
-SSMI_HEADER = "SSMI"
+SSMI_HEADER = 'SSMI'
 
 COMMANDS = {
-    "1": ("LOGIN", ["username", "password"]),
-    "2": ("SEND_SMS", ["validity", "msisdn", "message"]),
-    "101": ("ACK", ["ack_type"]),
+    '1': ('LOGIN', ['username', 'password']),
+    '2': ('SEND_SMS', ['validity', 'msisdn', 'message']),
+    '3': ('LINK_CHECK', []),
+    '101': ('ACK', ['ack_type']),
 }
 
 
@@ -14,6 +15,6 @@ COMMAND_IDS = dict([(value, key)
 COMMAND_FIELDS = dict(value for key, value in COMMANDS.items())
 
 ACK_TYPES = {
-    "LOGIN_OK": "1",
-    "LINK_CHECK_RESPONSE": "2",
+    'LOGIN_OK': '1',
+    'LINK_CHECK_RESPONSE': '2',
 }
