@@ -12,7 +12,8 @@ SendBinarySMS = SSMICommand.create('SEND_BINARY_SMS', {
     'coding': CODING_7BIT,
     'pid': PROTOCOL_STANDARD,
 })
+SendUSSDMessage = SSMICommand.create('SEND_USSD_MESSAGE')
+SendWAPPushMessage = SSMICommand.create('SEND_WAP_PUSH_MESSAGE')
+SendMMSMessage = SSMICommand.create('SEND_MMS_MESSAGE')
 LinkCheck = SSMICommand.create('LINK_CHECK')
 Logout = SSMICommand.create('LOGOUT')
-USSDMessage = SSMICommand.create('USSD_MESSAGE')
-WAPPushMessage = SSMICommand.create('WAP_PUSH_MESSAGE')

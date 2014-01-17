@@ -1,4 +1,5 @@
 import binascii
+from StringIO import StringIO
 
 from twisted.internet import reactor
 from twisted.internet.defer import Deferred, inlineCallbacks
@@ -109,7 +110,7 @@ class ProtocolTestCase(TestCase):
         self.protocol.send_ussd_message(
             '2700000000', 'hello world', session_type=USSD_INITIATE)
         [cmd] = yield self.receive(1)
-        self.assertEqual(cmd.command_name, 'USSD_MESSAGE')
+        self.assertEqual(cmd.command_name, 'SEND_USSD_MESSAGE')
         self.assertEqual(cmd.msisdn, '2700000000')
         self.assertEqual(cmd.type, USSD_INITIATE)
         self.assertEqual(cmd.message, 'hello world')
@@ -119,7 +120,30 @@ class ProtocolTestCase(TestCase):
         self.protocol.send_wap_push_message(
             '2700000000', 'foo', 'http://bar/baz.gif')
         [cmd] = yield self.receive(1)
-        self.assertEqual(cmd.command_name, 'WAP_PUSH_MESSAGE')
+        self.assertEqual(cmd.command_name, 'SEND_WAP_PUSH_MESSAGE')
         self.assertEqual(cmd.msisdn, '2700000000')
         self.assertEqual(cmd.subject, 'foo')
         self.assertEqual(cmd.url, 'http://bar/baz.gif')
+
+    @inlineCallbacks
+    def test_send_mms_message_with_stringio(self):
+        self.protocol.send_mms_message(
+            '2700000000', 'subject', 'name.gif', StringIO(u'hello world'))
+        [cmd] = yield self.receive(1)
+        self.assertEqual(cmd.command_name, 'SEND_MMS_MESSAGE')
+        self.assertEqual(cmd.msisdn, '2700000000')
+        self.assertEqual(cmd.subject, 'subject')
+        self.assertEqual(cmd.name, 'name.gif')
+        self.assertEqual(cmd.content, binascii.hexlify(u'hello world'))
+
+    @inlineCallbacks
+    def test_send_mms_message_with_hex(self):
+        hex_msg = binascii.hexlify(StringIO(u'hello world').read())
+        self.protocol.send_mms_message(
+            '2700000000', 'subject', 'name.gif', hex_msg)
+        [cmd] = yield self.receive(1)
+        self.assertEqual(cmd.command_name, 'SEND_MMS_MESSAGE')
+        self.assertEqual(cmd.msisdn, '2700000000')
+        self.assertEqual(cmd.subject, 'subject')
+        self.assertEqual(cmd.name, 'name.gif')
+        self.assertEqual(cmd.content, binascii.hexlify(u'hello world'))
