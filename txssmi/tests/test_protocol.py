@@ -113,3 +113,13 @@ class ProtocolTestCase(TestCase):
         self.assertEqual(cmd.msisdn, '2700000000')
         self.assertEqual(cmd.type, USSD_INITIATE)
         self.assertEqual(cmd.message, 'hello world')
+
+    @inlineCallbacks
+    def test_wap_push_message(self):
+        self.protocol.send_wap_push_message(
+            '2700000000', 'foo', 'http://bar/baz.gif')
+        [cmd] = yield self.receive(1)
+        self.assertEqual(cmd.command_name, 'WAP_PUSH_MESSAGE')
+        self.assertEqual(cmd.msisdn, '2700000000')
+        self.assertEqual(cmd.subject, 'foo')
+        self.assertEqual(cmd.url, 'http://bar/baz.gif')
