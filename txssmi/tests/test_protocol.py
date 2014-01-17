@@ -3,7 +3,8 @@ from twisted.internet.defer import Deferred, inlineCallbacks
 from twisted.internet import reactor
 from twisted.test.proto_helpers import StringTransport
 
-from txssmi.commands import Login
+from txssmi.builder import SSMICommand
+from txssmi.commands import Login, Ack
 from txssmi.protocol import SSMIProtocol
 
 
@@ -18,7 +19,7 @@ class ProtocolTestCase(TestCase):
         self.protocol.makeConnection(self.transport)
 
     def send(self, command):
-        self.protocol.dataReceived(str(command) + self.protocol.delimeter)
+        return self.protocol.lineReceived(str(command))
 
     def receive(self, count, clear=True):
         d = Deferred()
@@ -30,7 +31,7 @@ class ProtocolTestCase(TestCase):
             commands = self.transport.value().split(self.protocol.delimiter)
             if clear:
                 self.transport.clear()
-            d.callback(filter(None, commands))
+            d.callback(map(SSMICommand.parse, filter(None, commands)))
 
         check_for_input()
 
@@ -41,3 +42,11 @@ class ProtocolTestCase(TestCase):
         self.protocol.login('username', 'password')
         [cmd] = yield self.receive(1)
         self.assertEqual(cmd, Login(username='username', password='password'))
+
+    @inlineCallbacks
+    def test_authenticate(self):
+        d = self.protocol.authenticate('username', 'password')
+        [cmd] = yield self.receive(1)
+        self.assertEqual(cmd.command_name, 'LOGIN')
+        yield self.send(Ack(ack_type=1))
+        self.assertTrue((yield d))

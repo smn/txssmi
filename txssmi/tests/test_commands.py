@@ -1,6 +1,6 @@
 from twisted.trial.unittest import TestCase
 
-from txssmi.commands import SSMICommand, SSMICommandException
+from txssmi.builder import SSMICommand, SSMICommandException
 
 
 class SSMICommandTestCase(TestCase):
