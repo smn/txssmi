@@ -8,7 +8,8 @@ COMMANDS = {
                               'hex_msg']),
     '99': ('LOGOUT', []),
     '101': ('ACK', ['ack_type']),
-    '110': ('USSD_MESSAGE', ['msisdn', 'type', 'message'])
+    '110': ('USSD_MESSAGE', ['msisdn', 'type', 'message']),
+    '112': ('WAP_PUSH_MESSAGE', ['msisdn', 'subject', 'url'])
 }
 
 

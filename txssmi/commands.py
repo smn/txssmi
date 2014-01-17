@@ -15,3 +15,4 @@ SendBinarySMS = SSMICommand.create('SEND_BINARY_SMS', {
 LinkCheck = SSMICommand.create('LINK_CHECK')
 Logout = SSMICommand.create('LOGOUT')
 USSDMessage = SSMICommand.create('USSD_MESSAGE')
+WAPPushMessage = SSMICommand.create('WAP_PUSH_MESSAGE')
