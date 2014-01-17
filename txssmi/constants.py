@@ -2,6 +2,7 @@ SSMI_HEADER = "SSMI"
 
 COMMANDS = {
     "1": ("LOGIN", ["username", "password"]),
+    "2": ("SEND_SMS", ["validity", "msisdn", "message"]),
     "101": ("ACK", ["ack_type"]),
 }
 
