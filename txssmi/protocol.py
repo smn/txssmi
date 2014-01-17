@@ -1,5 +1,7 @@
 # -*- test-case-name: txssmi.tests.test_protocol -*-
 
+import binascii
+
 from twisted.internet import reactor
 from twisted.internet.defer import maybeDeferred, succeed, DeferredQueue
 from twisted.internet.task import LoopingCall
@@ -9,8 +11,8 @@ from twisted.python import log
 from smspdu import gsm0338
 
 from txssmi.commands import (
-    Login, SendSMS, LinkCheck, SendBinarySMS, Logout, USSDMessage,
-    WAPPushMessage)
+    Login, SendSMS, LinkCheck, SendBinarySMS, Logout, SendUSSDMessage,
+    SendWAPPushMessage, SendMMSMessage)
 from txssmi.constants import (
     COMMAND_IDS, ACK_LOGIN_OK, CODING_7BIT, PROTOCOL_STANDARD)
 from txssmi.builder import SSMICommand
@@ -81,11 +83,18 @@ class SSMIProtocol(LineReceiver):
 
     def send_ussd_message(self, msisdn, message, session_type):
         return self.send_command(
-            USSDMessage(msisdn=msisdn, message=message, type=session_type))
+            SendUSSDMessage(msisdn=msisdn, message=message, type=session_type))
 
     def send_wap_push_message(self, msisdn, subject, url):
         return self.send_command(
-            WAPPushMessage(msisdn=msisdn, subject=subject, url=url))
+            SendWAPPushMessage(msisdn=msisdn, subject=subject, url=url))
+
+    def send_mms_message(self, msisdn, subject, name, content):
+        if not isinstance(content, basestring):
+            content = binascii.hexlify(content.getvalue())
+        return self.send_command(
+            SendMMSMessage(msisdn=msisdn, subject=subject, name=name,
+                           content=content))
 
     def handle_ACK(self, ack):
         return self.event_queue.put(ack)
