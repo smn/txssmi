@@ -28,10 +28,13 @@ class ProtocolTestCase(TestCase):
             if not self.transport.value():
                 reactor.callLater(0, check_for_input)
                 return
-            commands = self.transport.value().split(self.protocol.delimiter)
-            if clear:
-                self.transport.clear()
-            d.callback(map(SSMICommand.parse, filter(None, commands)))
+
+            lines = self.transport.value().split(self.protocol.delimiter)
+            commands = map(SSMICommand.parse, filter(None, lines))
+            if len(commands) == count:
+                d.callback(commands)
+                if clear:
+                    self.transport.clear()
 
         check_for_input()
 
