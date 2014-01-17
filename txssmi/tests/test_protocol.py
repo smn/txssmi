@@ -1,7 +1,8 @@
-from twisted.trial.unittest import TestCase
-from twisted.internet.defer import Deferred, inlineCallbacks
 from twisted.internet import reactor
+from twisted.internet.defer import Deferred, inlineCallbacks
+from twisted.internet.task import Clock
 from twisted.test.proto_helpers import StringTransport
+from twisted.trial.unittest import TestCase
 
 from txssmi.builder import SSMICommand
 from txssmi.commands import Login, Ack
@@ -10,10 +11,13 @@ from txssmi.protocol import SSMIProtocol
 
 class ProtocolTestCase(TestCase):
 
+    protocol_class = SSMIProtocol
     timeout = 1
 
     def setUp(self):
-        self.protocol = SSMIProtocol()
+        self.clock = Clock()
+        self.patch(self.protocol_class, 'clock', self.clock)
+        self.protocol = self.protocol_class()
         self.protocol.noisy = True
         self.transport = StringTransport()
         self.protocol.makeConnection(self.transport)
@@ -48,11 +52,13 @@ class ProtocolTestCase(TestCase):
 
     @inlineCallbacks
     def test_authenticate(self):
+        self.assertFalse(self.protocol.authenticated)
         d = self.protocol.authenticate('username', 'password')
         [cmd] = yield self.receive(1)
         self.assertEqual(cmd.command_name, 'LOGIN')
         yield self.send(Ack(ack_type=1))
         self.assertTrue((yield d))
+        self.assertTrue(self.protocol.authenticated)
 
     @inlineCallbacks
     def test_send_sms(self):
@@ -62,3 +68,13 @@ class ProtocolTestCase(TestCase):
         self.assertEqual(cmd.msisdn, '2700000000')
         self.assertEqual(cmd.message, 'hi there!')
         self.assertEqual(cmd.validity, '2')
+
+    @inlineCallbacks
+    def test_link_check(self):
+        self.assertFalse(self.transport.value())
+        self.protocol.link_check.start(60)
+        [check1] = yield self.receive(1)
+        self.clock.advance(60)
+        [check2] = yield self.receive(1)
+        self.assertEqual(check1.command_name, 'LINK_CHECK')
+        self.assertEqual(check2.command_name, 'LINK_CHECK')
