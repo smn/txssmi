@@ -8,9 +8,10 @@ from twisted.python import log
 
 from smspdu import gsm0338
 
-from txssmi.commands import Login, SendSMS, LinkCheck, SendBinarySMS, Logout
+from txssmi.commands import (
+    Login, SendSMS, LinkCheck, SendBinarySMS, Logout, USSDMessage)
 from txssmi.constants import (
-    COMMAND_IDS, ACK_TYPES, CODING_7BIT, PROTOCOL_STANDARD)
+    COMMAND_IDS, ACK_LOGIN_OK, CODING_7BIT, PROTOCOL_STANDARD)
 from txssmi.builder import SSMICommand
 
 gsm = gsm0338()
@@ -59,7 +60,7 @@ class SSMIProtocol(LineReceiver):
 
         def cb(cmd):
             success = (cmd.command_id == COMMAND_IDS['ACK'] and
-                       cmd.ack_type == ACK_TYPES['LOGIN_OK'])
+                       cmd.ack_type == ACK_LOGIN_OK)
             self.authenticated = success
             return cmd
 
@@ -76,6 +77,10 @@ class SSMIProtocol(LineReceiver):
         return self.send_command(
             SendBinarySMS(msisdn=msisdn, hex_msg=hex_message,
                           validity=validity, pid=protocol_id, coding=coding))
+
+    def send_ussd_message(self, msisdn, message, session_type):
+        return self.send_command(
+            USSDMessage(msisdn=msisdn, message=message, type=session_type))
 
     def handle_ACK(self, ack):
         return self.event_queue.put(ack)

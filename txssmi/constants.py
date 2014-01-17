@@ -8,6 +8,7 @@ COMMANDS = {
                               'hex_msg']),
     '99': ('LOGOUT', []),
     '101': ('ACK', ['ack_type']),
+    '110': ('USSD_MESSAGE', ['msisdn', 'type', 'message'])
 }
 
 
@@ -19,10 +20,14 @@ COMMAND_FIELDS = dict(value for key, value in COMMANDS.items())
 
 CODING_7BIT = '0'
 CODING_8BIT = '246'
+
 PROTOCOL_STANDARD = '0'
 PROTOCOL_ENHANCED = '15'
 
-ACK_TYPES = {
-    'LOGIN_OK': '1',
-    'LINK_CHECK_RESPONSE': '2',
-}
+USSD_RESPONSE = '2'
+USSD_END = '3'
+USSD_REDIRECT = '5'
+USSD_INITIATE = '6'
+
+ACK_LOGIN_OK = '1'
+ACK_LINK_CHECK_RESPONSE = '2'
