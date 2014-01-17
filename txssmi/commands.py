@@ -13,3 +13,4 @@ SendBinarySMS = SSMICommand.create('SEND_BINARY_SMS', {
     'pid': PROTOCOL_STANDARD,
 })
 LinkCheck = SSMICommand.create('LINK_CHECK')
+Logout = SSMICommand.create('LOGOUT')

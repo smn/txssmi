@@ -8,7 +8,7 @@ from twisted.python import log
 
 from smspdu import gsm0338
 
-from txssmi.commands import Login, SendSMS, LinkCheck, SendBinarySMS
+from txssmi.commands import Login, SendSMS, LinkCheck, SendBinarySMS, Logout
 from txssmi.constants import (
     COMMAND_IDS, ACK_TYPES, CODING_7BIT, PROTOCOL_STANDARD)
 from txssmi.builder import SSMICommand
@@ -49,6 +49,9 @@ class SSMIProtocol(LineReceiver):
 
     def login(self, username, password):
         return self.send_command(Login(username=username, password=password))
+
+    def logout(self):
+        return self.send_command(Logout())
 
     def authenticate(self, username, password):
         d = self.login(username, password)

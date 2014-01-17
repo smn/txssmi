@@ -97,3 +97,9 @@ class ProtocolTestCase(TestCase):
         self.assertEqual(cmd.msisdn, '2700000000')
         self.assertEqual(cmd.pid, PROTOCOL_ENHANCED)
         self.assertEqual(cmd.coding, CODING_8BIT)
+
+    @inlineCallbacks
+    def test_logout(self):
+        self.protocol.logout()
+        [cmd] = yield self.receive(1)
+        self.assertEqual(cmd.command_name, 'LOGOUT')

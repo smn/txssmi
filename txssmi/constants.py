@@ -6,6 +6,7 @@ COMMANDS = {
     '3': ('LINK_CHECK', []),
     '4': ('SEND_BINARY_SMS', ['validity', 'msisdn', 'pid', 'coding',
                               'hex_msg']),
+    '99': ('LOGOUT', []),
     '101': ('ACK', ['ack_type']),
 }
 
