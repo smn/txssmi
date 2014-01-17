@@ -7,37 +7,9 @@ from twisted.python import log
 
 from smspdu import gsm0338
 
-from txssmi import constants as c
+from txssmi.commands import Login
 
 gsm = gsm0338()
-
-
-class Request(object):
-
-    def __init__(self, request_type, *request_fields):
-        self.request_type = request_type
-        self.request_fields = request_fields
-
-    def __iter__(self):
-        parts = [c.SSMI_HEADER, self.request_type]
-        parts.extend(self.request_fields)
-        return iter(map(unicode, parts))
-
-    def __unicode__(self):
-        return u','.join(self)
-
-    def __str__(self):
-        return unicode(self).encode('utf-8')
-
-    def __eq__(self, other):
-        return unicode(other) == unicode(self)
-
-    @classmethod
-    def create(cls, request_type):
-        return partial(cls, request_type)
-
-
-Login = Request.create(c.SSMI_SEND_LOGIN)
 
 
 class SSMIProtocol(LineReceiver):
@@ -50,8 +22,8 @@ class SSMIProtocol(LineReceiver):
             log.msg('%s %s' % (prefix, msg))
 
     def send_command(self, command):
-        self.emit('>>', command)
+        self.emit('>>', '%s: %s' % (command.command_name, command.values))
         return self.sendLine(str(command))
 
     def login(self, username, password):
-        self.send_command(Login(username, password))
+        self.send_command(Login(username=username, password=password))
