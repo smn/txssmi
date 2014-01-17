@@ -9,7 +9,7 @@ from twisted.trial.unittest import TestCase
 from txssmi.builder import SSMICommand
 from txssmi.commands import Login, Ack
 from txssmi.protocol import SSMIProtocol
-from txssmi.constants import CODING_8BIT, PROTOCOL_ENHANCED
+from txssmi.constants import (CODING_8BIT, PROTOCOL_ENHANCED, USSD_INITIATE)
 
 
 class ProtocolTestCase(TestCase):
@@ -87,7 +87,7 @@ class ProtocolTestCase(TestCase):
         self.assertEqual(check2.command_name, 'LINK_CHECK')
 
     @inlineCallbacks
-    def test_send_binary_sms(self):
+    def test_send_binary_message(self):
         self.protocol.send_binary_message(
             '2700000000', binascii.hexlify('hello world'),
             protocol_id=PROTOCOL_ENHANCED, coding=CODING_8BIT)
@@ -103,3 +103,13 @@ class ProtocolTestCase(TestCase):
         self.protocol.logout()
         [cmd] = yield self.receive(1)
         self.assertEqual(cmd.command_name, 'LOGOUT')
+
+    @inlineCallbacks
+    def test_send_ussd_message(self):
+        self.protocol.send_ussd_message(
+            '2700000000', 'hello world', session_type=USSD_INITIATE)
+        [cmd] = yield self.receive(1)
+        self.assertEqual(cmd.command_name, 'USSD_MESSAGE')
+        self.assertEqual(cmd.msisdn, '2700000000')
+        self.assertEqual(cmd.type, USSD_INITIATE)
+        self.assertEqual(cmd.message, 'hello world')
