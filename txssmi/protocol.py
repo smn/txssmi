@@ -7,7 +7,7 @@ from twisted.python import log
 
 from smspdu import gsm0338
 
-from txssmi.constants import SSMI_HEADER
+from txssmi import constants as c
 
 gsm = gsm0338()
 
@@ -19,7 +19,7 @@ class Request(object):
         self.request_fields = request_fields
 
     def __iter__(self):
-        parts = [SSMI_HEADER, self.request_type]
+        parts = [c.SSMI_HEADER, self.request_type]
         parts.extend(self.request_fields)
         return iter(map(unicode, parts))
 
@@ -37,7 +37,7 @@ class Request(object):
         return partial(cls, request_type)
 
 
-Login = Request.create(1)
+Login = Request.create(c.SSMI_SEND_LOGIN)
 
 
 class SSMIProtocol(LineReceiver):
