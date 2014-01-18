@@ -7,7 +7,7 @@ from twisted.test.proto_helpers import StringTransport
 from twisted.trial.unittest import TestCase
 
 from txssmi.builder import SSMIRequest
-from txssmi.commands import Login, Ack, IMSILookupReply
+from txssmi.commands import Login, Ack, IMSILookupReply, Seq
 from txssmi.protocol import SSMIProtocol
 from txssmi.constants import (
     CODING_8BIT, PROTOCOL_ENHANCED, USSD_INITIATE, USSD_NEW)
@@ -163,3 +163,12 @@ class ProtocolTestCase(TestCase):
         self.assertEqual(cmd.message, 'hello world')
         self.assertEqual(cmd.type, USSD_NEW)
         self.assertEqual(cmd.genfields, 'foo:bar:baz')
+
+    @inlineCallbacks
+    def test_received_sequence_message(self):
+        d = self.protocol.send_message('2700000000', 'foo')
+        [cmd] = yield self.receive(1)
+        yield self.send(Seq(msisdn='2700000000', sequence='bar'))
+        resp = yield d
+        self.assertEqual(resp.sequence, 'bar')
+        self.assertEqual(resp.msisdn, '2700000000')

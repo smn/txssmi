@@ -22,6 +22,7 @@ REQUEST_IDS = dict([(value, key)
 REQUEST_FIELDS = dict(value for key, value in SSMI_REQUESTS.items())
 
 SSMI_RESPONSES = {
+    '100': ('SEQ', ['msisdn', 'sequence']),
     '101': ('ACK', ['ack_type']),
     '600': ('IMSI_LOOKUP_REPLY', ['sequence', 'msisdn', 'imsi', 'spid']),
 }

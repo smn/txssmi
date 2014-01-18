@@ -22,4 +22,5 @@ LinkCheck = SSMIRequest.create('LINK_CHECK')
 Logout = SSMIRequest.create('LOGOUT')
 
 Ack = SSMIResponse.create('ACK')
+Seq = SSMIResponse.create('SEQ')
 IMSILookupReply = SSMIResponse.create('IMSI_LOOKUP_REPLY')
