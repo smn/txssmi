@@ -1,35 +1,35 @@
 from twisted.trial.unittest import TestCase
 
-from txssmi.builder import SSMICommand, SSMICommandException
+from txssmi.builder import SSMIRequest, SSMICommandException
 
 
 class SSMICommandTestCase(TestCase):
 
     def test_valid_fields(self):
-        LoginCommand = SSMICommand.create('LOGIN', {})
-        login = LoginCommand(username='foo', password='bar')
+        LoginRequest = SSMIRequest.create('LOGIN', {})
+        login = LoginRequest(username='foo', password='bar')
         self.assertEqual(login.username, 'foo')
         self.assertEqual(login.password, 'bar')
 
     def test_defaults(self):
-        LoginCommand = SSMICommand.create('LOGIN', {'username': 'foo'})
-        login = LoginCommand(password='bar')
+        LoginRequest = SSMIRequest.create('LOGIN', {'username': 'foo'})
+        login = LoginRequest(password='bar')
         self.assertEqual(login.username, 'foo')
         self.assertEqual(login.password, 'bar')
 
     def test_missing_fields(self):
-        LoginCommand = SSMICommand.create('LOGIN', {'username': 'foo'})
+        LoginRequest = SSMIRequest.create('LOGIN', {'username': 'foo'})
         self.assertRaisesRegexp(
-            SSMICommandException, 'Missing fields: password', LoginCommand)
+            SSMICommandException, 'Missing fields: password', LoginRequest)
 
     def test_unsupported_field(self):
-        LoginCommand = SSMICommand.create('LOGIN', {})
+        LoginRequest = SSMIRequest.create('LOGIN', {})
         self.assertRaisesRegexp(
             SSMICommandException, 'Unsupported fields: foo',
-            LoginCommand, foo='foo')
+            LoginRequest, foo='foo')
 
     def test_parse(self):
-        LoginCommand = SSMICommand.create('LOGIN')
-        expected_cmd = LoginCommand(username='foo', password='bar')
-        cmd = SSMICommand.parse('SSMI,1,foo,bar')
+        LoginRequest = SSMIRequest.create('LOGIN')
+        expected_cmd = LoginRequest(username='foo', password='bar')
+        cmd = SSMIRequest.parse('SSMI,1,foo,bar')
         self.assertEqual(cmd, expected_cmd)

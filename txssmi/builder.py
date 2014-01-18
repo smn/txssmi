@@ -1,5 +1,7 @@
 from txssmi.constants import (
-    SSMI_HEADER, COMMAND_IDS, COMMAND_NAMES, COMMAND_FIELDS)
+    SSMI_HEADER,
+    REQUEST_IDS, REQUEST_NAMES, REQUEST_FIELDS,
+    RESPONSE_IDS, RESPONSE_NAMES, RESPONSE_FIELDS)
 
 
 class SSMIException(Exception):
@@ -16,6 +18,9 @@ class SSMICommand(object):
     command_id = None
     fields = []
     defaults = {}
+    command_name_map = {}
+    command_id_map = {}
+    command_field_map = {}
 
     def __init__(self, **kwargs):
         self.values = self.defaults.copy()
@@ -59,10 +64,10 @@ class SSMICommand(object):
 
     @classmethod
     def create(cls, command_name, defaults={}):
-        return type('%sSSMICommand' % (command_name.title(),), (cls,), {
+        return type('%s%s' % (command_name.title(), cls.__name__), (cls,), {
             'command_name': command_name,
-            'command_id': COMMAND_IDS[command_name],
-            'fields': COMMAND_FIELDS[command_name],
+            'command_id': cls.command_id_map[command_name],
+            'fields': cls.command_field_map[command_name],
             'defaults': defaults,
         })
 
@@ -73,12 +78,24 @@ class SSMICommand(object):
         if header != SSMI_HEADER:
             raise SSMICommandException('Unknown header: %s.' % (SSMI_HEADER,))
         command_id = parts[1]
-        command_name = COMMAND_NAMES.get(command_id)
+        command_name = cls.command_name_map.get(command_id)
         if command_name is None:
             raise SSMICommandException(
                 'Unknown command id: %s.' % (command_id,))
         command_values = parts[2:]
-        command_fields = COMMAND_FIELDS[command_name]
+        command_fields = cls.command_field_map[command_name]
         values = dict(zip(command_fields, command_values))
         command_cls = cls.create(command_name)
         return command_cls(**values)
+
+
+class SSMIRequest(SSMICommand):
+    command_id_map = REQUEST_IDS
+    command_name_map = REQUEST_NAMES
+    command_field_map = REQUEST_FIELDS
+
+
+class SSMIResponse(SSMICommand):
+    command_id_map = RESPONSE_IDS
+    command_name_map = RESPONSE_NAMES
+    command_field_map = RESPONSE_FIELDS

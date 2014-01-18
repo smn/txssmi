@@ -7,8 +7,8 @@ from twisted.internet.task import Clock
 from twisted.test.proto_helpers import StringTransport
 from twisted.trial.unittest import TestCase
 
-from txssmi.builder import SSMICommand
-from txssmi.commands import Login, Ack
+from txssmi.builder import SSMIRequest
+from txssmi.commands import Login, Ack, IMSILookupReply
 from txssmi.protocol import SSMIProtocol
 from txssmi.constants import (CODING_8BIT, PROTOCOL_ENHANCED, USSD_INITIATE)
 
@@ -38,7 +38,7 @@ class ProtocolTestCase(TestCase):
                 return
 
             lines = self.transport.value().split(self.protocol.delimiter)
-            commands = map(SSMICommand.parse, filter(None, lines))
+            commands = map(SSMIRequest.parse, filter(None, lines))
             if len(commands) == count:
                 d.callback(commands)
                 if clear:
@@ -126,9 +126,10 @@ class ProtocolTestCase(TestCase):
         self.assertEqual(cmd.url, 'http://bar/baz.gif')
 
     @inlineCallbacks
-    def test_send_mms_message_with_stringio(self):
+    def test_send_mms_message(self):
         self.protocol.send_mms_message(
-            '2700000000', 'subject', 'name.gif', StringIO(u'hello world'))
+            '2700000000', 'subject', 'name.gif',
+            binascii.hexlify('hello world'))
         [cmd] = yield self.receive(1)
         self.assertEqual(cmd.command_name, 'SEND_MMS_MESSAGE')
         self.assertEqual(cmd.msisdn, '2700000000')
@@ -137,13 +138,15 @@ class ProtocolTestCase(TestCase):
         self.assertEqual(cmd.content, binascii.hexlify(u'hello world'))
 
     @inlineCallbacks
-    def test_send_mms_message_with_hex(self):
-        hex_msg = binascii.hexlify(StringIO(u'hello world').read())
-        self.protocol.send_mms_message(
-            '2700000000', 'subject', 'name.gif', hex_msg)
+    def test_imsi_lookup(self):
+        d = self.protocol.imsi_lookup('2700000000', imsi='12345')
         [cmd] = yield self.receive(1)
-        self.assertEqual(cmd.command_name, 'SEND_MMS_MESSAGE')
+        self.assertEqual(cmd.command_name, 'IMSI_LOOKUP')
         self.assertEqual(cmd.msisdn, '2700000000')
-        self.assertEqual(cmd.subject, 'subject')
-        self.assertEqual(cmd.name, 'name.gif')
-        self.assertEqual(cmd.content, binascii.hexlify(u'hello world'))
+        self.assertEqual(cmd.imsi, '12345')
+        sequence = cmd.sequence
+        reply_cmd = IMSILookupReply(sequence=sequence, msisdn=cmd.msisdn,
+                                    imsi=cmd.imsi, spid='spid')
+        yield self.send(reply_cmd)
+        response = yield d
+        self.assertEqual(response, reply_cmd)
