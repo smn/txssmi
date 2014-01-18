@@ -25,6 +25,7 @@ SSMI_RESPONSES = {
     '100': ('SEQ', ['msisdn', 'sequence']),
     '101': ('ACK', ['ack_type']),
     '103': ('MO', ['msisdn', 'sequence', 'message']),
+    '104': ('DR', ['msisdn', 'sequence', 'ret_code']),
     '600': ('IMSI_LOOKUP_REPLY', ['sequence', 'msisdn', 'imsi', 'spid']),
 }
 
@@ -49,3 +50,10 @@ USSD_INITIATE = '6'
 
 ACK_LOGIN_OK = '1'
 ACK_LINK_CHECK_RESPONSE = '2'
+
+DR_SUCCESS = '0'
+DR_MESSAGE_EXPIRED = '1'
+DR_SIM_FULL = '2'
+DR_DEST_BARRED = '3'
+DR_INV_DEST_ADDR = '4'
+DR_DEST_BLACKLISTED = '5'

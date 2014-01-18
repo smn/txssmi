@@ -151,4 +151,7 @@ class SSMIProtocol(LineReceiver):
         return self.sequence_reply_map[seq.msisdn].put(seq)
 
     def handle_MO(self, mo):
-        print 'mo', mo
+        log.msg('Received MO: %r' % (mo,))
+
+    def handle_DR(self, mo):
+        log.msg('Received DR: %r' % (mo,))
