@@ -10,7 +10,7 @@ from txssmi.builder import SSMIRequest
 from txssmi.commands import (
     Login, Ack, IMSILookupReply, Seq, MoMessage, DrMessage, FFMessage,
     BMoMessage, PremiumMoMessage, PremiumBMoMessage, USSDMessage,
-    ExtendedUSSDMEssage)
+    ExtendedUSSDMEssage, ServerLogout)
 from txssmi.protocol import SSMIProtocol
 from txssmi.constants import (
     CODING_8BIT, PROTOCOL_ENHANCED, USSD_INITIATE, USSD_NEW, DR_SUCCESS,
@@ -250,5 +250,13 @@ class ProtocolTestCase(TestCase):
         cmd = ExtendedUSSDMEssage(msisdn='2700000000', type=USSD_NEW,
                                   phase=USSD_PHASE_2, message='*100#',
                                   genfields='655011234567890:1::')
+        yield self.send(cmd)
+        self.assertEqual([cmd], calls)
+
+    @inlineCallbacks
+    def test_server_logout(self):
+        calls = []
+        self.patch(self.protocol_class, 'handle_LOGOUT', calls.append)
+        cmd = ServerLogout(ip='127.0.0.1')
         yield self.send(cmd)
         self.assertEqual([cmd], calls)

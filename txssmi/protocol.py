@@ -14,7 +14,7 @@ from twisted.python import log
 from smspdu import gsm0338
 
 from txssmi.commands import (
-    Login, SendSMS, LinkCheck, SendBinarySMS, Logout, SendUSSDMessage,
+    Login, SendSMS, LinkCheck, SendBinarySMS, ClientLogout, SendUSSDMessage,
     SendWAPPushMessage, SendMMSMessage, IMSILookup, SendExtendedUSSDMessage,
     MoMessage)
 from txssmi.constants import (
@@ -67,7 +67,7 @@ class SSMIProtocol(LineReceiver):
         return self.send_command(Login(username=username, password=password))
 
     def logout(self):
-        return self.send_command(Logout())
+        return self.send_command(ClientLogout())
 
     def authenticate(self, username, password):
         d = self.login(username, password)
@@ -173,3 +173,6 @@ class SSMIProtocol(LineReceiver):
 
     def handle_EXTENDED_USSD_MESSAGE(self, um):
         log.msg('Received EXTENDED_USSD_MESSAGE: %r' % (um,))
+
+    def handle_LOGOUT(self, msg):
+        log.msg('Received LOGOUT: %r' % (msg,))

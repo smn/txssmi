@@ -34,6 +34,7 @@ SSMI_RESPONSES = {
     '110': ('USSD_MESSAGE', ['msisdn', 'type', 'phase', 'message']),
     '111': ('EXTENDED_USSD_MESSAGE', ['msisdn', 'type', 'phase', 'genfields',
                                       'message']),
+    '199': ('LOGOUT', ['ip']),
     '600': ('IMSI_LOOKUP_REPLY', ['sequence', 'msisdn', 'imsi', 'spid']),
 }
 
