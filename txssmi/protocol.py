@@ -2,6 +2,7 @@
 
 import binascii
 import random
+from collections import defaultdict
 
 from twisted.internet import reactor
 from twisted.internet.defer import (
@@ -32,7 +33,8 @@ class SSMIProtocol(LineReceiver):
     def __init__(self):
         self.authenticated = False
         self.event_queue = DeferredQueue()
-        self.imsi_lookup_reply_map = {}
+        self.sequence_reply_map = defaultdict(lambda: DeferredQueue())
+        self.imsi_lookup_reply_map = defaultdict(lambda: DeferredQueue())
         self.link_check = LoopingCall(self.send_link_request)
         self.link_check.clock = self.clock
         self.imsi_lookups = {}
@@ -49,12 +51,16 @@ class SSMIProtocol(LineReceiver):
 
     def send_command(self, command):
         self.emit('>>', str(command))
-        return succeed(self.sendLine(str(command)))
+        self.sendLine(str(command))
+        return succeed(command)
 
     def send_link_request(self):
         if not self.authenticated:
             return
         return self.send_command(LinkCheck())
+
+    def wait_for_reply(self, msisdn):
+        return self.sequence_reply_map[msisdn].get()
 
     def login(self, username, password):
         return self.send_command(Login(username=username, password=password))
@@ -76,40 +82,52 @@ class SSMIProtocol(LineReceiver):
         return d
 
     def send_message(self, msisdn, message, validity=0):
-        return self.send_command(
+        d = self.send_command(
             SendSMS(msisdn=msisdn, message=message, validity=validity))
+        d.addCallback(lambda cmd: self.wait_for_reply(cmd.msisdn))
+        return d
 
     def send_binary_message(self, msisdn, hex_message, validity=0,
                             protocol_id=PROTOCOL_STANDARD,
                             coding=CODING_7BIT):
-        return self.send_command(
+        d = self.send_command(
             SendBinarySMS(msisdn=msisdn, hex_msg=hex_message,
                           validity=validity, pid=protocol_id, coding=coding))
+        d.addCallback(lambda cmd: self.wait_for_reply(cmd.msisdn))
+        return d
 
     def send_ussd_message(self, msisdn, message, session_type):
-        return self.send_command(
+        d = self.send_command(
             SendUSSDMessage(msisdn=msisdn, message=message, type=session_type))
+        d.addCallback(lambda cmd: self.wait_for_reply(cmd.msisdn))
+        return d
 
     def send_extended_ussd_message(self, msisdn, message, session_type,
                                    genfields):
         if session_type not in [USSD_NEW, USSD_RESPONSE, USSD_END]:
             raise SSMICommandException(
                 'Invalid session_type: %s' % (session_type,))
-        return self.send_command(
+        d = self.send_command(
             SendExtendedUSSDMessage(msisdn=msisdn, message=message,
                                     type=session_type,
                                     genfields=':'.join(genfields)))
+        d.addCallback(lambda cmd: self.wait_for_reply(cmd.msisdn))
+        return d
 
     def send_wap_push_message(self, msisdn, subject, url):
-        return self.send_command(
+        d = self.send_command(
             SendWAPPushMessage(msisdn=msisdn, subject=subject, url=url))
+        d.addCallback(lambda cmd: self.wait_for_reply(cmd.msisdn))
+        return d
 
     def send_mms_message(self, msisdn, subject, name, content):
         if not isinstance(content, basestring):
             content = binascii.hexlify(content.getvalue())
-        return self.send_command(
+        d = self.send_command(
             SendMMSMessage(msisdn=msisdn, subject=subject, name=name,
                            content=content))
+        d.addCallback(lambda cmd: self.wait_for_reply(cmd.msisdn))
+        return d
 
     def imsi_lookup(self, msisdn, sequence=None, imsi=None):
         if sequence is None:
@@ -129,3 +147,6 @@ class SSMIProtocol(LineReceiver):
 
     def handle_IMSI_LOOKUP_REPLY(self, resp):
         return self.imsi_lookup_reply_map[resp.sequence].callback(resp)
+
+    def handle_SEQ(self, seq):
+        return self.sequence_reply_map[seq.msisdn].put(seq)
