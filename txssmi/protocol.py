@@ -15,7 +15,8 @@ from smspdu import gsm0338
 
 from txssmi.commands import (
     Login, SendSMS, LinkCheck, SendBinarySMS, Logout, SendUSSDMessage,
-    SendWAPPushMessage, SendMMSMessage, IMSILookup, SendExtendedUSSDMessage)
+    SendWAPPushMessage, SendMMSMessage, IMSILookup, SendExtendedUSSDMessage,
+    MoMessage)
 from txssmi.constants import (
     RESPONSE_IDS, ACK_LOGIN_OK, CODING_7BIT, PROTOCOL_STANDARD, USSD_NEW,
     USSD_RESPONSE, USSD_END)
@@ -121,8 +122,6 @@ class SSMIProtocol(LineReceiver):
         return d
 
     def send_mms_message(self, msisdn, subject, name, content):
-        if not isinstance(content, basestring):
-            content = binascii.hexlify(content.getvalue())
         d = self.send_command(
             SendMMSMessage(msisdn=msisdn, subject=subject, name=name,
                            content=content))
@@ -150,3 +149,6 @@ class SSMIProtocol(LineReceiver):
 
     def handle_SEQ(self, seq):
         return self.sequence_reply_map[seq.msisdn].put(seq)
+
+    def handle_MO(self, mo):
+        print 'mo', mo

@@ -23,4 +23,5 @@ Logout = SSMIRequest.create('LOGOUT')
 
 Ack = SSMIResponse.create('ACK')
 Seq = SSMIResponse.create('SEQ')
+MoMessage = SSMIResponse.create('MO')
 IMSILookupReply = SSMIResponse.create('IMSI_LOOKUP_REPLY')
