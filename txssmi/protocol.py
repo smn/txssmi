@@ -155,3 +155,6 @@ class SSMIProtocol(LineReceiver):
 
     def handle_DR(self, mo):
         log.msg('Received DR: %r' % (mo,))
+
+    def handle_FREE_FORM(self, ff):
+        log.msg('Received FREE_FORM: %r' % (ff,))

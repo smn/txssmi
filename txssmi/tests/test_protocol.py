@@ -8,7 +8,7 @@ from twisted.trial.unittest import TestCase
 
 from txssmi.builder import SSMIRequest
 from txssmi.commands import (
-    Login, Ack, IMSILookupReply, Seq, MoMessage, DrMessage)
+    Login, Ack, IMSILookupReply, Seq, MoMessage, DrMessage, FFMessage)
 from txssmi.protocol import SSMIProtocol
 from txssmi.constants import (
     CODING_8BIT, PROTOCOL_ENHANCED, USSD_INITIATE, USSD_NEW, DR_SUCCESS)
@@ -188,5 +188,13 @@ class ProtocolTestCase(TestCase):
         calls = []
         self.patch(self.protocol_class, 'handle_DR', calls.append)
         cmd = DrMessage(msisdn='2700000000', sequence='1', ret_code=DR_SUCCESS)
+        yield self.send(cmd)
+        self.assertEqual([cmd], calls)
+
+    @inlineCallbacks
+    def test_free_form(self):
+        calls = []
+        self.patch(self.protocol_class, 'handle_FREE_FORM', calls.append)
+        cmd = FFMessage(text='foo')
         yield self.send(cmd)
         self.assertEqual([cmd], calls)
