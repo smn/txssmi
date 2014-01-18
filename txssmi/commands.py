@@ -19,7 +19,7 @@ IMSILookup = SSMIRequest.create('IMSI_LOOKUP', {
     'imsi': '',
 })
 LinkCheck = SSMIRequest.create('LINK_CHECK')
-Logout = SSMIRequest.create('LOGOUT')
+ClientLogout = SSMIRequest.create('LOGOUT')
 
 Ack = SSMIResponse.create('ACK')
 Seq = SSMIResponse.create('SEQ')
@@ -32,3 +32,4 @@ PremiumBMoMessage = SSMIResponse.create('PREMIUM_BINARY_MO')
 IMSILookupReply = SSMIResponse.create('IMSI_LOOKUP_REPLY')
 USSDMessage = SSMIResponse.create('USSD_MESSAGE')
 ExtendedUSSDMEssage = SSMIResponse.create('EXTENDED_USSD_MESSAGE')
+ServerLogout = SSMIResponse.create('LOGOUT')
