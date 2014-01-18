@@ -32,6 +32,8 @@ SSMI_RESPONSES = {
     '108': ('PREMIUM_BINARY_MO', ['msisdn', 'sequence', 'pid', 'coding',
                                   'destination', 'hex_msg']),
     '110': ('USSD_MESSAGE', ['msisdn', 'type', 'phase', 'message']),
+    '111': ('EXTENDED_USSD_MESSAGE', ['msisdn', 'type', 'phase', 'genfields',
+                                      'message']),
     '600': ('IMSI_LOOKUP_REPLY', ['sequence', 'msisdn', 'imsi', 'spid']),
 }
 

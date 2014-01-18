@@ -9,7 +9,8 @@ from twisted.trial.unittest import TestCase
 from txssmi.builder import SSMIRequest
 from txssmi.commands import (
     Login, Ack, IMSILookupReply, Seq, MoMessage, DrMessage, FFMessage,
-    BMoMessage, PremiumMoMessage, PremiumBMoMessage, USSDMessage)
+    BMoMessage, PremiumMoMessage, PremiumBMoMessage, USSDMessage,
+    ExtendedUSSDMEssage)
 from txssmi.protocol import SSMIProtocol
 from txssmi.constants import (
     CODING_8BIT, PROTOCOL_ENHANCED, USSD_INITIATE, USSD_NEW, DR_SUCCESS,
@@ -238,5 +239,16 @@ class ProtocolTestCase(TestCase):
         self.patch(self.protocol_class, 'handle_USSD_MESSAGE', calls.append)
         cmd = USSDMessage(msisdn='2700000000', type=USSD_TIMEOUT,
                           phase=USSD_PHASE_2, message='foo')
+        yield self.send(cmd)
+        self.assertEqual([cmd], calls)
+
+    @inlineCallbacks
+    def test_extended_ussd_message(self):
+        calls = []
+        self.patch(self.protocol_class, 'handle_EXTENDED_USSD_MESSAGE',
+                   calls.append)
+        cmd = ExtendedUSSDMEssage(msisdn='2700000000', type=USSD_NEW,
+                                  phase=USSD_PHASE_2, message='*100#',
+                                  genfields='655011234567890:1::')
         yield self.send(cmd)
         self.assertEqual([cmd], calls)
