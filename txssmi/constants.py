@@ -10,6 +10,8 @@ SSMI_REQUESTS = {
     '110': ('SEND_USSD_MESSAGE', ['msisdn', 'type', 'message']),
     '111': ('SEND_MMS_MESSAGE', ['msisdn', 'subject', 'name', 'content']),
     '112': ('SEND_WAP_PUSH_MESSAGE', ['msisdn', 'subject', 'url']),
+    '120': ('SEND_EXTENDED_USSD_MESSAGE', ['msisdn', 'type', 'genfields',
+                                           'message']),
     '600': ('IMSI_LOOKUP', ['sequence', 'msisdn', 'imsi'])
 }
 
@@ -37,6 +39,7 @@ CODING_8BIT = '246'
 PROTOCOL_STANDARD = '0'
 PROTOCOL_ENHANCED = '15'
 
+USSD_NEW = '1'
 USSD_RESPONSE = '2'
 USSD_END = '3'
 USSD_REDIRECT = '5'

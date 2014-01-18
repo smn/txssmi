@@ -14,6 +14,7 @@ SendBinarySMS = SSMIRequest.create('SEND_BINARY_SMS', {
 SendUSSDMessage = SSMIRequest.create('SEND_USSD_MESSAGE')
 SendWAPPushMessage = SSMIRequest.create('SEND_WAP_PUSH_MESSAGE')
 SendMMSMessage = SSMIRequest.create('SEND_MMS_MESSAGE')
+SendExtendedUSSDMessage = SSMIRequest.create('SEND_EXTENDED_USSD_MESSAGE')
 IMSILookup = SSMIRequest.create('IMSI_LOOKUP', {
     'imsi': '',
 })
