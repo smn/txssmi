@@ -31,6 +31,9 @@ SSMI_RESPONSES = {
     '107': ('PREMIUM_MO', ['msisdn', 'sequence', 'destination', 'message']),
     '108': ('PREMIUM_BINARY_MO', ['msisdn', 'sequence', 'pid', 'coding',
                                   'destination', 'hex_msg']),
+    '110': ('USSD_MESSAGE', ['msisdn', 'type', 'phase', 'message']),
+    '111': ('EXTENDED_USSD_MESSAGE', ['msisdn', 'type', 'phase', 'genfields',
+                                      'message']),
     '600': ('IMSI_LOOKUP_REPLY', ['sequence', 'msisdn', 'imsi', 'spid']),
 }
 
@@ -50,8 +53,13 @@ PROTOCOL_ENHANCED = '15'
 USSD_NEW = '1'
 USSD_RESPONSE = '2'
 USSD_END = '3'
+USSD_TIMEOUT = '4'
 USSD_REDIRECT = '5'
 USSD_INITIATE = '6'
+
+USSD_PHASE_UNKNOWN = '0'
+USSD_PHASE_1 = '1'
+USSD_PHASE_2 = '2'
 
 ACK_LOGIN_OK = '1'
 ACK_LINK_CHECK_RESPONSE = '2'

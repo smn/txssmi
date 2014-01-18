@@ -167,3 +167,9 @@ class SSMIProtocol(LineReceiver):
 
     def handle_PREMIUM_BINARY_MO(self, bmo):
         log.msg('Received PREMIUM_BINARY_MO: %r' % (bmo,))
+
+    def handle_USSD_MESSAGE(self, um):
+        log.msg('Received USSD_MESSAGE: %r' % (um,))
+
+    def handle_EXTENDED_USSD_MESSAGE(self, um):
+        log.msg('Received EXTENDED_USSD_MESSAGE: %r' % (um,))
