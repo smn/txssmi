@@ -158,3 +158,6 @@ class SSMIProtocol(LineReceiver):
 
     def handle_FREE_FORM(self, ff):
         log.msg('Received FREE_FORM: %r' % (ff,))
+
+    def handle_BINARY_MO(self, bmo):
+        log.msg('Received BINARY_MO: %r' % (bmo,))
