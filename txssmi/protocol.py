@@ -14,10 +14,11 @@ from smspdu import gsm0338
 
 from txssmi.commands import (
     Login, SendSMS, LinkCheck, SendBinarySMS, Logout, SendUSSDMessage,
-    SendWAPPushMessage, SendMMSMessage, IMSILookup)
+    SendWAPPushMessage, SendMMSMessage, IMSILookup, SendExtendedUSSDMessage)
 from txssmi.constants import (
-    RESPONSE_IDS, ACK_LOGIN_OK, CODING_7BIT, PROTOCOL_STANDARD)
-from txssmi.builder import SSMIResponse
+    RESPONSE_IDS, ACK_LOGIN_OK, CODING_7BIT, PROTOCOL_STANDARD, USSD_NEW,
+    USSD_RESPONSE, USSD_END)
+from txssmi.builder import SSMIResponse, SSMICommandException
 
 gsm = gsm0338()
 
@@ -88,6 +89,16 @@ class SSMIProtocol(LineReceiver):
     def send_ussd_message(self, msisdn, message, session_type):
         return self.send_command(
             SendUSSDMessage(msisdn=msisdn, message=message, type=session_type))
+
+    def send_extended_ussd_message(self, msisdn, message, session_type,
+                                   genfields):
+        if session_type not in [USSD_NEW, USSD_RESPONSE, USSD_END]:
+            raise SSMICommandException(
+                'Invalid session_type: %s' % (session_type,))
+        return self.send_command(
+            SendExtendedUSSDMessage(msisdn=msisdn, message=message,
+                                    type=session_type,
+                                    genfields=':'.join(genfields)))
 
     def send_wap_push_message(self, msisdn, subject, url):
         return self.send_command(

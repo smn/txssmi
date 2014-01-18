@@ -1,5 +1,4 @@
 import binascii
-from StringIO import StringIO
 
 from twisted.internet import reactor
 from twisted.internet.defer import Deferred, inlineCallbacks
@@ -10,7 +9,8 @@ from twisted.trial.unittest import TestCase
 from txssmi.builder import SSMIRequest
 from txssmi.commands import Login, Ack, IMSILookupReply
 from txssmi.protocol import SSMIProtocol
-from txssmi.constants import (CODING_8BIT, PROTOCOL_ENHANCED, USSD_INITIATE)
+from txssmi.constants import (
+    CODING_8BIT, PROTOCOL_ENHANCED, USSD_INITIATE, USSD_NEW)
 
 
 class ProtocolTestCase(TestCase):
@@ -108,7 +108,7 @@ class ProtocolTestCase(TestCase):
     @inlineCallbacks
     def test_send_ussd_message(self):
         self.protocol.send_ussd_message(
-            '2700000000', 'hello world', session_type=USSD_INITIATE)
+            '2700000000', 'hello world', USSD_INITIATE)
         [cmd] = yield self.receive(1)
         self.assertEqual(cmd.command_name, 'SEND_USSD_MESSAGE')
         self.assertEqual(cmd.msisdn, '2700000000')
@@ -150,3 +150,16 @@ class ProtocolTestCase(TestCase):
         yield self.send(reply_cmd)
         response = yield d
         self.assertEqual(response, reply_cmd)
+
+    @inlineCallbacks
+    def test_send_extended_ussd_message(self):
+        self.protocol.send_extended_ussd_message(
+            '2700000000', message='hello world',
+            session_type=USSD_NEW,
+            genfields=['foo', 'bar', 'baz'])
+        [cmd] = yield self.receive(1)
+        self.assertEqual(cmd.command_name, 'SEND_EXTENDED_USSD_MESSAGE')
+        self.assertEqual(cmd.msisdn, '2700000000')
+        self.assertEqual(cmd.message, 'hello world')
+        self.assertEqual(cmd.type, USSD_NEW)
+        self.assertEqual(cmd.genfields, 'foo:bar:baz')
