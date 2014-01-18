@@ -64,13 +64,13 @@ class ProtocolTestCase(TestCase):
         d = self.protocol.authenticate('username', 'password')
         [cmd] = yield self.receive(1)
         self.assertEqual(cmd.command_name, 'LOGIN')
-        yield self.send(Ack(ack_type=1))
+        yield self.send(Ack(ack_type='1'))
         self.assertTrue((yield d))
         self.assertTrue(self.protocol.authenticated)
 
     @inlineCallbacks
     def test_send_message(self):
-        self.protocol.send_message('2700000000', 'hi there!', validity=2)
+        self.protocol.send_message('2700000000', 'hi there!', validity='2')
         [cmd] = yield self.receive(1)
         self.assertEqual(cmd.command_name, 'SEND_SMS')
         self.assertEqual(cmd.msisdn, '2700000000')

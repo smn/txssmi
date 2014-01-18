@@ -5,9 +5,9 @@ from txssmi.constants import CODING_7BIT, PROTOCOL_STANDARD
 
 
 Login = SSMIRequest.create('LOGIN')
-SendSMS = SSMIRequest.create('SEND_SMS', {'validity': 0})
+SendSMS = SSMIRequest.create('SEND_SMS', {'validity': '0'})
 SendBinarySMS = SSMIRequest.create('SEND_BINARY_SMS', {
-    'validity': 0,
+    'validity': '0',
     'coding': CODING_7BIT,
     'pid': PROTOCOL_STANDARD,
 })

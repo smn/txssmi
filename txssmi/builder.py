@@ -42,16 +42,13 @@ class SSMICommand(object):
     def __iter__(self):
         parts = [SSMI_HEADER, self.command_id]
         parts.extend([self.values.get(fn) for fn in self.fields])
-        return iter(map(unicode, parts))
-
-    def __unicode__(self):
-        return u','.join(self)
+        return iter(parts)
 
     def __str__(self):
-        return unicode(self).encode('utf-8')
+        return ','.join(self)
 
     def __eq__(self, other):
-        return unicode(other) == unicode(self)
+        return str(other) == str(self)
 
     def __getattr__(self, attr):
         if attr in self.fields:

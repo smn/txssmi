@@ -1,4 +1,5 @@
 # -*- test-case-name: txssmi.tests.test_protocol -*-
+# -*- coding: utf-8 -*-
 
 import random
 from collections import defaultdict
@@ -25,7 +26,7 @@ gsm = gsm0338()
 
 class SSMIProtocol(LineReceiver):
 
-    delimeter = '\r'
+    delimiter = b'\r'
     noisy = False
     clock = reactor
 
@@ -36,17 +37,22 @@ class SSMIProtocol(LineReceiver):
         self.imsi_lookup_reply_map = defaultdict(lambda: DeferredQueue())
         self.link_check = LoopingCall(self.send_link_request)
         self.link_check.clock = self.clock
-        self.imsi_lookups = {}
+
+    def connectionMade(self):
+        log.msg('Connection made.')
+
+    def connectionLost(self, reason):
+        log.msg('Connection lost: %s' % (reason,))
 
     def emit(self, prefix, msg):
         if self.noisy:
-            log.msg('%s %s' % (prefix, msg))
+            log.msg('%s %r' % (prefix, msg))
 
     def lineReceived(self, line):
         command = SSMIResponse.parse(line)
-        self.emit('<<', str(command))
+        self.emit('<<', command)
         handler = getattr(self, 'handle_%s' % (command.command_name,))
-        return maybeDeferred(handler, command)
+        maybeDeferred(handler, command)
 
     def send_command(self, command):
         self.emit('>>', str(command))
@@ -80,13 +86,13 @@ class SSMIProtocol(LineReceiver):
         d.addCallback(cb)
         return d
 
-    def send_message(self, msisdn, message, validity=0):
+    def send_message(self, msisdn, message, validity='0'):
         d = self.send_command(
             SendSMS(msisdn=msisdn, message=message, validity=validity))
         d.addCallback(lambda cmd: self.wait_for_reply(cmd.msisdn))
         return d
 
-    def send_binary_message(self, msisdn, hex_message, validity=0,
+    def send_binary_message(self, msisdn, hex_message, validity='0',
                             protocol_id=PROTOCOL_STANDARD,
                             coding=CODING_7BIT):
         d = self.send_command(
@@ -128,7 +134,7 @@ class SSMIProtocol(LineReceiver):
 
     def imsi_lookup(self, msisdn, sequence=None, imsi=None):
         if sequence is None:
-            sequence = unicode(random.randint(0, 1000))
+            sequence = str(random.randint(0, 1000))
         d = self.send_command(IMSILookup(sequence=sequence, msisdn=msisdn,
                                          imsi=imsi))
         deferred = Deferred()
