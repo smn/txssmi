@@ -9,7 +9,7 @@ from twisted.trial.unittest import TestCase
 from txssmi.builder import SSMIRequest
 from txssmi.commands import (
     Login, Ack, IMSILookupReply, Seq, MoMessage, DrMessage, FFMessage,
-    BinaryMoMessage)
+    BMoMessage, PremiumMoMessage, PremiumBMoMessage)
 from txssmi.protocol import SSMIProtocol
 from txssmi.constants import (
     CODING_8BIT, PROTOCOL_ENHANCED, USSD_INITIATE, USSD_NEW, DR_SUCCESS)
@@ -204,8 +204,29 @@ class ProtocolTestCase(TestCase):
     def test_binary_mo(self):
         calls = []
         self.patch(self.protocol_class, 'handle_BINARY_MO', calls.append)
-        cmd = BinaryMoMessage(msisdn='2700000000', sequence='1',
-                              coding=CODING_8BIT, pid=PROTOCOL_ENHANCED,
-                              hex_msg=binascii.hexlify('hello'))
+        cmd = BMoMessage(msisdn='2700000000', sequence='1',
+                         coding=CODING_8BIT, pid=PROTOCOL_ENHANCED,
+                         hex_msg=binascii.hexlify('hello'))
+        yield self.send(cmd)
+        self.assertEqual([cmd], calls)
+
+    @inlineCallbacks
+    def test_premium_mo(self):
+        calls = []
+        self.patch(self.protocol_class, 'handle_PREMIUM_MO', calls.append)
+        cmd = PremiumMoMessage(msisdn='2700000000', sequence='1',
+                               destination='foo', message='bar')
+        yield self.send(cmd)
+        self.assertEqual([cmd], calls)
+
+    @inlineCallbacks
+    def test_premium_binary_mo(self):
+        calls = []
+        self.patch(self.protocol_class, 'handle_PREMIUM_BINARY_MO',
+                   calls.append)
+        cmd = PremiumBMoMessage(msisdn='2700000000', sequence='1',
+                                     coding=CODING_8BIT, pid=PROTOCOL_ENHANCED,
+                                     hex_msg=binascii.hexlify('hello'),
+                                     destination='foo')
         yield self.send(cmd)
         self.assertEqual([cmd], calls)

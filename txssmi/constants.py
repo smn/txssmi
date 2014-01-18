@@ -28,6 +28,9 @@ SSMI_RESPONSES = {
     '104': ('DR', ['msisdn', 'sequence', 'ret_code']),
     '105': ('FREE_FORM', ['text']),
     '106': ('BINARY_MO', ['msisdn', 'sequence', 'pid', 'coding', 'hex_msg']),
+    '107': ('PREMIUM_MO', ['msisdn', 'sequence', 'destination', 'message']),
+    '108': ('PREMIUM_BINARY_MO', ['msisdn', 'sequence', 'pid', 'coding',
+                                  'destination', 'hex_msg']),
     '600': ('IMSI_LOOKUP_REPLY', ['sequence', 'msisdn', 'imsi', 'spid']),
 }
 
