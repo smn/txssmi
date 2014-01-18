@@ -26,6 +26,7 @@ SSMI_RESPONSES = {
     '101': ('ACK', ['ack_type']),
     '103': ('MO', ['msisdn', 'sequence', 'message']),
     '104': ('DR', ['msisdn', 'sequence', 'ret_code']),
+    '105': ('FREE_FORM', ['text']),
     '600': ('IMSI_LOOKUP_REPLY', ['sequence', 'msisdn', 'imsi', 'spid']),
 }
 
