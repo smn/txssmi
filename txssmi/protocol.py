@@ -1,6 +1,5 @@
 # -*- test-case-name: txssmi.tests.test_protocol -*-
 
-import binascii
 import random
 from collections import defaultdict
 
@@ -15,8 +14,7 @@ from smspdu import gsm0338
 
 from txssmi.commands import (
     Login, SendSMS, LinkCheck, SendBinarySMS, ClientLogout, SendUSSDMessage,
-    SendWAPPushMessage, SendMMSMessage, IMSILookup, SendExtendedUSSDMessage,
-    MoMessage)
+    SendWAPPushMessage, SendMMSMessage, IMSILookup, SendExtendedUSSDMessage)
 from txssmi.constants import (
     RESPONSE_IDS, ACK_LOGIN_OK, CODING_7BIT, PROTOCOL_STANDARD, USSD_NEW,
     USSD_RESPONSE, USSD_END)
