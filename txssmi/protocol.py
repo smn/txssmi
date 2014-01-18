@@ -1,9 +1,11 @@
 # -*- test-case-name: txssmi.tests.test_protocol -*-
 
 import binascii
+import random
 
 from twisted.internet import reactor
-from twisted.internet.defer import maybeDeferred, succeed, DeferredQueue
+from twisted.internet.defer import (
+    maybeDeferred, succeed, DeferredQueue, Deferred)
 from twisted.internet.task import LoopingCall
 from twisted.protocols.basic import LineReceiver
 from twisted.python import log
@@ -12,10 +14,10 @@ from smspdu import gsm0338
 
 from txssmi.commands import (
     Login, SendSMS, LinkCheck, SendBinarySMS, Logout, SendUSSDMessage,
-    SendWAPPushMessage, SendMMSMessage)
+    SendWAPPushMessage, SendMMSMessage, IMSILookup)
 from txssmi.constants import (
-    COMMAND_IDS, ACK_LOGIN_OK, CODING_7BIT, PROTOCOL_STANDARD)
-from txssmi.builder import SSMICommand
+    RESPONSE_IDS, ACK_LOGIN_OK, CODING_7BIT, PROTOCOL_STANDARD)
+from txssmi.builder import SSMIResponse
 
 gsm = gsm0338()
 
@@ -29,15 +31,17 @@ class SSMIProtocol(LineReceiver):
     def __init__(self):
         self.authenticated = False
         self.event_queue = DeferredQueue()
+        self.imsi_lookup_reply_map = {}
         self.link_check = LoopingCall(self.send_link_request)
         self.link_check.clock = self.clock
+        self.imsi_lookups = {}
 
     def emit(self, prefix, msg):
         if self.noisy:
             log.msg('%s %s' % (prefix, msg))
 
     def lineReceived(self, line):
-        command = SSMICommand.parse(line)
+        command = SSMIResponse.parse(line)
         self.emit('<<', str(command))
         handler = getattr(self, 'handle_%s' % (command.command_name,))
         return maybeDeferred(handler, command)
@@ -62,7 +66,7 @@ class SSMIProtocol(LineReceiver):
         d.addCallback(lambda _: self.event_queue.get())
 
         def cb(cmd):
-            success = (cmd.command_id == COMMAND_IDS['ACK'] and
+            success = (cmd.command_id == RESPONSE_IDS['ACK'] and
                        cmd.ack_type == ACK_LOGIN_OK)
             self.authenticated = success
             return cmd
@@ -96,8 +100,21 @@ class SSMIProtocol(LineReceiver):
             SendMMSMessage(msisdn=msisdn, subject=subject, name=name,
                            content=content))
 
+    def imsi_lookup(self, msisdn, sequence=None, imsi=None):
+        if sequence is None:
+            sequence = unicode(random.randint(0, 1000))
+        d = self.send_command(IMSILookup(sequence=sequence, msisdn=msisdn,
+                                         imsi=imsi))
+        deferred = Deferred()
+        self.imsi_lookup_reply_map[sequence] = deferred
+        d.addCallback(lambda _: deferred)
+        return d
+
     def handle_ACK(self, ack):
         return self.event_queue.put(ack)
 
     def handle_NACK(self, nack):
         return self.event_queue.put(nack)
+
+    def handle_IMSI_LOOKUP_REPLY(self, resp):
+        return self.imsi_lookup_reply_map[resp.sequence].callback(resp)
