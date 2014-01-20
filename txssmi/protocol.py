@@ -87,10 +87,8 @@ class SSMIProtocol(LineReceiver):
         return d
 
     def send_message(self, msisdn, message, validity='0'):
-        d = self.send_command(
+        return self.send_command(
             SendSMS(msisdn=msisdn, message=message, validity=validity))
-        d.addCallback(lambda cmd: self.wait_for_reply(cmd.msisdn))
-        return d
 
     def send_binary_message(self, msisdn, hex_message, validity='0',
                             protocol_id=PROTOCOL_STANDARD,
@@ -102,35 +100,27 @@ class SSMIProtocol(LineReceiver):
         return d
 
     def send_ussd_message(self, msisdn, message, session_type):
-        d = self.send_command(
+        return self.send_command(
             SendUSSDMessage(msisdn=msisdn, message=message, type=session_type))
-        d.addCallback(lambda cmd: self.wait_for_reply(cmd.msisdn))
-        return d
 
     def send_extended_ussd_message(self, msisdn, message, session_type,
                                    genfields):
         if session_type not in [USSD_NEW, USSD_RESPONSE, USSD_END]:
             raise SSMICommandException(
                 'Invalid session_type: %s' % (session_type,))
-        d = self.send_command(
+        return self.send_command(
             SendExtendedUSSDMessage(msisdn=msisdn, message=message,
                                     type=session_type,
                                     genfields=':'.join(genfields)))
-        d.addCallback(lambda cmd: self.wait_for_reply(cmd.msisdn))
-        return d
 
     def send_wap_push_message(self, msisdn, subject, url):
-        d = self.send_command(
+        return self.send_command(
             SendWAPPushMessage(msisdn=msisdn, subject=subject, url=url))
-        d.addCallback(lambda cmd: self.wait_for_reply(cmd.msisdn))
-        return d
 
     def send_mms_message(self, msisdn, subject, name, content):
-        d = self.send_command(
+        return self.send_command(
             SendMMSMessage(msisdn=msisdn, subject=subject, name=name,
                            content=content))
-        d.addCallback(lambda cmd: self.wait_for_reply(cmd.msisdn))
-        return d
 
     def imsi_lookup(self, msisdn, sequence=None, imsi=None):
         if sequence is None:

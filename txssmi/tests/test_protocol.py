@@ -170,7 +170,7 @@ class ProtocolTestCase(TestCase):
 
     @inlineCallbacks
     def test_received_sequence_message(self):
-        d = self.protocol.send_message('2700000000', 'foo')
+        d = self.protocol.send_binary_message('2700000000', 'foo')
         [cmd] = yield self.receive(1)
         yield self.send(Seq(msisdn='2700000000', sequence='bar'))
         resp = yield d
