@@ -55,7 +55,7 @@ class SSMIProtocol(LineReceiver):
         maybeDeferred(handler, command)
 
     def send_command(self, command):
-        self.emit('>>', str(command))
+        self.emit('>>', command)
         self.sendLine(str(command))
         return succeed(command)
 
