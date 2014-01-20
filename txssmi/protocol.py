@@ -11,8 +11,6 @@ from twisted.internet.task import LoopingCall
 from twisted.protocols.basic import LineReceiver
 from twisted.python import log
 
-from smspdu import gsm0338
-
 from txssmi.commands import (
     Login, SendSMS, LinkCheck, SendBinarySMS, ClientLogout, SendUSSDMessage,
     SendWAPPushMessage, SendMMSMessage, IMSILookup, SendExtendedUSSDMessage)
@@ -20,8 +18,6 @@ from txssmi.constants import (
     RESPONSE_IDS, ACK_LOGIN_OK, CODING_7BIT, PROTOCOL_STANDARD, USSD_NEW,
     USSD_RESPONSE, USSD_END)
 from txssmi.builder import SSMIResponse, SSMICommandException
-
-gsm = gsm0338()
 
 
 class SSMIProtocol(LineReceiver):

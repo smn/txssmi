@@ -16,7 +16,6 @@ setup(
     include_package_data=True,
     install_requires=[
         'Twisted',
-        'smspdu==1.0',
     ],
     classifiers=[
         'Development Status :: 3 - Alpha',

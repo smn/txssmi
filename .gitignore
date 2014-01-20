@@ -3,3 +3,5 @@
 /ve/
 *.egg-info/
 /_trial_temp*
+.DS_Store
+/dist/
