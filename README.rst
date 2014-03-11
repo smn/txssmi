@@ -12,9 +12,9 @@ Contributions welcome.
 
 .. _Truteq: http://www.truteq.co.za
 
-.. |travis| image:: https://travis-ci.org/smn/txssmi.png?branch=develop
-.. _travis: https://travis-ci.org/smn/txssmi
+.. |travis| image:: https://travis-ci.org/praekelt/txssmi.png?branch=develop
+.. _travis: https://travis-ci.org/praekelt/txssmi
 
-.. |coveralls| image:: https://coveralls.io/repos/smn/txssmi/badge.png?branch=develop
-.. _coveralls: https://coveralls.io/r/smn/txssmi
+.. |coveralls| image:: https://coveralls.io/repos/praekelt/txssmi/badge.png?branch=develop
+.. _coveralls: https://coveralls.io/r/praekelt/txssmi
 
