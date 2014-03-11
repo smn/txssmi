@@ -10,7 +10,7 @@ from txssmi.builder import SSMIRequest
 from txssmi.commands import (
     Login, Ack, IMSILookupReply, Seq, MoMessage, DrMessage, FFMessage,
     BMoMessage, PremiumMoMessage, PremiumBMoMessage, USSDMessage,
-    ExtendedUSSDMessage, ServerLogout)
+    ExtendedUSSDMessage, ServerLogout, Nack)
 from txssmi.protocol import SSMIProtocol
 from txssmi.constants import (
     CODING_8BIT, PROTOCOL_ENHANCED, USSD_INITIATE, USSD_NEW, DR_SUCCESS,
@@ -258,5 +258,13 @@ class ProtocolTestCase(TestCase):
         calls = []
         self.patch(self.protocol_class, 'handle_LOGOUT', calls.append)
         cmd = ServerLogout(ip='127.0.0.1')
+        yield self.send(cmd)
+        self.assertEqual([cmd], calls)
+
+    @inlineCallbacks
+    def test_nack(self):
+        calls = []
+        self.patch(self.protocol_class, 'handle_NACK', calls.append)
+        cmd = Nack(nack_type='')
         yield self.send(cmd)
         self.assertEqual([cmd], calls)

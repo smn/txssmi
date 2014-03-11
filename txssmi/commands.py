@@ -22,6 +22,7 @@ LinkCheck = SSMIRequest.create('LINK_CHECK')
 ClientLogout = SSMIRequest.create('LOGOUT')
 
 Ack = SSMIResponse.create('ACK')
+Nack = SSMIResponse.create('NACK')
 Seq = SSMIResponse.create('SEQ')
 MoMessage = SSMIResponse.create('MO')
 DrMessage = SSMIResponse.create('DR')
