@@ -24,6 +24,7 @@ REQUEST_FIELDS = dict(value for key, value in SSMI_REQUESTS.items())
 SSMI_RESPONSES = {
     '100': ('SEQ', ['msisdn', 'sequence']),
     '101': ('ACK', ['ack_type']),
+    '102': ('NACK', ['nack_type']),
     '103': ('MO', ['msisdn', 'sequence', 'message']),
     '104': ('DR', ['msisdn', 'sequence', 'ret_code']),
     '105': ('FREE_FORM', ['text']),
