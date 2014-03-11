@@ -263,8 +263,7 @@ class ProtocolTestCase(TestCase):
 
     @inlineCallbacks
     def test_nack(self):
-        calls = []
-        self.patch(self.protocol_class, 'handle_NACK', calls.append)
-        cmd = Nack(nack_type='')
+        cmd = Nack(nack_type='1')
         yield self.send(cmd)
-        self.assertEqual([cmd], calls)
+        nack = yield self.protocol.event_queue.get()
+        self.assertEqual(str(cmd), 'SSMI,102,1')
