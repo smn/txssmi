@@ -78,6 +78,15 @@ class ProtocolTestCase(TestCase):
         self.assertEqual(cmd.validity, '2')
 
     @inlineCallbacks
+    def test_send_message_with_comma(self):
+        self.protocol.send_message('2700000000', 'foo, bar', validity='2')
+        [cmd] = yield self.receive(1)
+        self.assertEqual(cmd.command_name, 'SEND_SMS')
+        self.assertEqual(cmd.msisdn, '2700000000')
+        self.assertEqual(cmd.message, 'foo, bar')
+        self.assertEqual(cmd.validity, '2')
+
+    @inlineCallbacks
     def test_link_check(self):
         self.assertFalse(self.transport.value())
         self.protocol.authenticated = False
@@ -183,6 +192,15 @@ class ProtocolTestCase(TestCase):
         self.patch(self.protocol_class, 'handle_MO', calls.append)
         cmd = MoMessage(msisdn='2700000000', sequence='1',
                         message='foo')
+        yield self.send(cmd)
+        self.assertEqual([cmd], calls)
+
+    @inlineCallbacks
+    def test_mo_with_comma(self):
+        calls = []
+        self.patch(self.protocol_class, 'handle_MO', calls.append)
+        cmd = MoMessage(msisdn='2700000000', sequence='1',
+                        message='foo, bar')
         yield self.send(cmd)
         self.assertEqual([cmd], calls)
 

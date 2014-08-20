@@ -70,17 +70,21 @@ class SSMICommand(object):
 
     @classmethod
     def parse(cls, command_string):
-        parts = command_string.split(',')
-        header = parts[0]
+        header, _, command_string = command_string.partition(',')
         if header != SSMI_HEADER:
             raise SSMICommandException('Unknown header: %s.' % (SSMI_HEADER,))
-        command_id = parts[1]
+        command_id, _, command_values = command_string.partition(',')
         command_name = cls.command_name_map.get(command_id)
         if command_name is None:
             raise SSMICommandException(
                 'Unknown command id: %s.' % (command_id,))
-        command_values = parts[2:]
         command_fields = cls.command_field_map[command_name]
+        command_values = command_values.split(',', len(command_fields) - 1)
+        if len(command_values) < len(command_fields):
+            raise SSMICommandException(
+                ('Wrong number of parameters for command: %s'
+                 ' (expected %s got %s).') % (
+                     command_id, len(command_fields), len(command_values)))
         values = dict(zip(command_fields, command_values))
         command_cls = cls.create(command_name)
         return command_cls(**values)
