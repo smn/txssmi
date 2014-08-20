@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name="txssmi",
-    version="0.2",
+    version="0.3.0",
     url='http://github.com/smn/txssmi',
     license='BSD',
     description="Twisted library for Truteq's SSMI protocol",
