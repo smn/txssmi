@@ -82,9 +82,8 @@ class SSMICommand(object):
         command_values = command_values.split(',', len(command_fields) - 1)
         if len(command_values) < len(command_fields):
             raise SSMICommandException(
-                ('Wrong number of parameters for command: %s'
-                 ' (expected %s got %s).') % (
-                     command_id, len(command_fields), len(command_values)))
+                'Too few parameters for command: %s (expected %s got %s)' % (
+                    command_name, len(command_fields), len(command_values)))
         values = dict(zip(command_fields, command_values))
         command_cls = cls.create(command_name)
         return command_cls(**values)
