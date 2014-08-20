@@ -33,3 +33,9 @@ class SSMICommandTestCase(TestCase):
         expected_cmd = LoginRequest(username='foo', password='bar')
         cmd = SSMIRequest.parse('SSMI,1,foo,bar')
         self.assertEqual(cmd, expected_cmd)
+
+    def test_parse_missing_fields(self):
+        self.assertRaisesRegexp(
+            SSMICommandException,
+            'Too few parameters for command: LOGIN \(expected 2 got 1\)',
+            SSMIRequest.parse, 'SSMI,1,foo')
